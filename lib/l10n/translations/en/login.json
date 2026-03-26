@@ -1,0 +1,19 @@
+{
+  "phiSigmaAlpha": "PHI SIGMA ALPHA",
+  "email": "Email",
+  "password": "Password",
+  "emailRequired": "Email required",
+  "passwordRequired": "Password required",
+  "login": "Login",
+  "forgotPassword": "Forgot my password",
+  "wantToBecome": "I want to become a member",
+  "invalidCredentials": "Invalid credentials",
+  "register": "Register",
+  "fullName": "Full name",
+  "nameRequired": "Name required",
+  "phone": "Phone (optional)",
+  "addPhoto": "Add photo (optional)",
+  "registrationError": "Registration error. Try again.",
+  "passwordMismatch": "Passwords do not match",
+  "alreadyHaveAccount": "I already have an account"
+}
