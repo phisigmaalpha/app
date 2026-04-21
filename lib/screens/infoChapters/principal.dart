@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:app/screens/home/components/models.dart';
 import 'widgets/history.dart';
-import 'widgets/news.dart';
 import 'widgets/events.dart';
+import 'widgets/chapter_events.dart';
 import 'widgets/documents.dart';
 
 class PrincipalScreen extends StatelessWidget {
@@ -13,7 +13,7 @@ class PrincipalScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 4, // Historia, Integrantes, Eventos, Documentación
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -22,16 +22,16 @@ class PrincipalScreen extends StatelessWidget {
           title: Row(
             children: [
               chapter.logoUrl != null
-                ? CircleAvatar(
-                    radius: 25,
-                    backgroundImage: NetworkImage(chapter.logoUrl!),
-                    backgroundColor: Colors.grey.shade200,
-                  )
-                : const CircleAvatar(
-                    backgroundColor: Colors.grey,
-                    radius: 25,
-                    child: Icon(Icons.groups, color: Colors.white),
-                  ),
+                  ? CircleAvatar(
+                      radius: 25,
+                      backgroundImage: NetworkImage(chapter.logoUrl!),
+                      backgroundColor: Colors.grey.shade200,
+                    )
+                  : const CircleAvatar(
+                      backgroundColor: Colors.grey,
+                      radius: 25,
+                      child: Icon(Icons.groups, color: Colors.white),
+                    ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -66,7 +66,7 @@ class PrincipalScreen extends StatelessWidget {
             tabs: [
               Tab(text: "Historia"),
               Tab(text: "Integrantes"),
-              Tab(text: "Noticias"),
+              Tab(text: "Eventos"),
               Tab(text: "Documentación"),
             ],
           ),
@@ -75,7 +75,7 @@ class PrincipalScreen extends StatelessWidget {
           children: [
             ChapterHistoryWidget(history: chapter.history),
             ChapterMembersWidget(chapterId: chapter.id),
-            const NewsWidget(),
+            ChapterEventsWidget(chapterId: chapter.id),
             DocumentsWidget(chapterId: chapter.id),
           ],
         ),

@@ -2,6 +2,7 @@ import 'package:app/screens/home/components/models.dart';
 import 'package:app/screens/home/widgets/homeContainers.dart';
 import 'package:app/screens/home/events.dart';
 import 'package:app/screens/home/favorites.dart';
+import 'package:app/screens/home/news.dart';
 import 'package:app/screens/home/profile.dart';
 import 'package:app/services/chapter_service.dart';
 import 'package:app/services/event_service.dart';
@@ -41,9 +42,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadData() async {
-    debugPrint('Auth user: ${supabase.auth.currentUser?.email}');
-    debugPrint('Session: ${supabase.auth.currentSession != null}');
-    // Load each data source independently so one failure doesn't block the rest
     final activos = await _chapterService.getChapters(type: 'activo');
     final militantes = await _chapterService.getChapters(type: 'militante');
 
@@ -86,38 +84,9 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onMenuItemSelected(int index) {
-    if (index == 4) {
-      _showLogoutDialog();
-    } else {
-      setState(() {
-        _selectedIndex = index;
-      });
-    }
-  }
-
-  void _showLogoutDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Cerrar sesión"),
-        content: const Text("¿Estás seguro que deseas cerrar sesión?"),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text("Cancelar"),
-          ),
-          TextButton(
-            onPressed: () async {
-              await _authService.signOut();
-              if (!context.mounted) return;
-              Navigator.pop(context);
-              Navigator.pushReplacementNamed(context, '/login');
-            },
-            child: const Text("Cerrar sesión"),
-          ),
-        ],
-      ),
-    );
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -141,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     : IndexedStack(
                         index: _selectedIndex,
                         children: [
-                          // Vista 0: Home
+                          // 0: Home
                           RefreshIndicator(
                             onRefresh: _loadData,
                             child: SingleChildScrollView(
@@ -160,7 +129,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                       type: 'chapter',
                                       chapters: _militantesChapters,
                                     ),
-
                                   const SizedBox(height: 10),
                                   if (_featuredEvent != null)
                                     ContainerSection(
@@ -175,19 +143,19 @@ class _HomeScreenState extends State<HomeScreen> {
                               ),
                             ),
                           ),
-                          // Vista 1: Eventos
+                          // 1: Eventos
                           EventSection(
                             favoriteIds: _favoriteIds,
                             onFavoriteToggled: _onFavoriteToggled,
                           ),
-                          // Vista 2: Favoritos
+                          // 2: Favoritos
                           FavoritesScreen(
                             onFavoriteToggled: _onFavoriteToggled,
                           ),
-                          // Vista 3: Perfil
+                          // 3: Noticias
+                          const NewsScreen(),
+                          // 4: Perfil
                           const ProfileScreen(),
-                          // Vista 4: Logout (placeholder)
-                          const SizedBox(),
                         ],
                       ),
               ),

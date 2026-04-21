@@ -80,7 +80,11 @@ class HomeNavbar extends StatelessWidget {
               const CircleAvatar(
                 radius: 30,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 30, color: Color.fromRGBO(24, 41, 163, 1)),
+                child: Icon(
+                  Icons.person,
+                  size: 30,
+                  color: Color.fromRGBO(24, 41, 163, 1),
+                ),
               ),
               const SizedBox(width: 15),
               Text(
@@ -93,23 +97,39 @@ class HomeNavbar extends StatelessWidget {
               ),
             ],
           )
-        : Column(
-            children: [
-              const CircleAvatar(
-                radius: 35,
-                backgroundColor: Colors.white,
-                child: Icon(Icons.person, size: 40, color: Color.fromRGBO(24, 41, 163, 1)),
-              ),
-              const SizedBox(width: 15),
-              Text(
-                userName.isNotEmpty ? userName : 'Usuario',
-                style: const TextStyle(
-                  color: Color.fromARGB(255, 255, 255, 255),
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
+        : // Avatar y nombre
+          Center(
+            child: Column(
+              children: [
+                CircleAvatar(
+                  radius: 35,
+                  backgroundColor: Color.fromRGBO(255, 255, 255, 0.165),
+                  child: Text(
+                    (userName.isNotEmpty ? userName : 'U')
+                        .substring(0, 1)
+                        .toUpperCase(),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFFFFFFFF),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 8),
+                Text(
+                  userName.isNotEmpty ? userName : '',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromRGBO(255, 255, 255, 1),
+                  ),
+                ),
+                // Text(
+                //   _profile!['email'] ?? '',
+                //   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                // ),
+              ],
+            ),
           );
   }
 }

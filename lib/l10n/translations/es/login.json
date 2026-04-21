@@ -15,5 +15,15 @@
   "addPhoto": "Agregar foto (opcional)",
   "registrationError": "Error al registrar. Intenta de nuevo.",
   "passwordMismatch": "Las contraseñas no coinciden",
-  "alreadyHaveAccount": "Ya tengo una cuenta"
+  "alreadyHaveAccount": "Ya tengo una cuenta",
+  "accountPendingApproval": "Cuenta pendiente de aprobación",
+  "accountPendingApprovalMessage": "Tu cuenta fue creada correctamente. Un administrador debe aprobarla antes de que puedas ingresar.",
+  "validateActivation": "Validar activación",
+  "accountStillPending": "Tu cuenta aún no ha sido activada. Intenta más tarde.",
+  "backToLogin": "Volver al login",
+  "ok": "Entendido",
+  "paymentNumberLabel": "Envía el pago al siguiente número:",
+  "copyNumber": "Copiar número",
+  "numberCopied": "Número copiado",
+  "paymentNoteInstruction": "Importante: agrega tu nombre o correo electrónico en la nota del pago para que podamos identificar tu transferencia y activar tu cuenta."
 }

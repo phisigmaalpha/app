@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -58,24 +59,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
         final ext = _profileImage!.path.split('.').last;
         final path = 'avatars/$userId.$ext';
 
-        await supabase.storage
-            .from('documents')
-            .upload(path, _profileImage!);
+        await supabase.storage.from('documents').upload(path, _profileImage!);
 
         await supabase
             .from('users')
-            .update({'biography': path}) // usar biography como avatar_path temporalmente
+            .update({
+              'biography': path,
+            }) // usar biography como avatar_path temporalmente
             .eq('email', _emailController.text.trim());
       }
 
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/home');
+      // Usuario queda inactivo hasta que un admin lo apruebe tras pagar.
+      // Lo mandamos a la pantalla de pago.
+      Navigator.pushReplacementNamed(context, '/membership');
     } catch (e) {
+      print(e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            localizations?.registrationError ?? 'Error al registrar. Intenta de nuevo.',
+            localizations?.registrationError ??
+                'Error al registrar. Intenta de nuevo.',
           ),
         ),
       );
@@ -114,21 +119,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: CircleAvatar(
                     radius: 50,
                     backgroundColor: Color.fromRGBO(24, 41, 163, 0.1),
-                    backgroundImage:
-                        _profileImage != null ? FileImage(_profileImage!) : null,
+                    backgroundImage: _profileImage != null
+                        ? FileImage(_profileImage!)
+                        : null,
                     child: _profileImage == null
-                        ? Icon(Icons.camera_alt,
-                            size: 32, color: Color.fromRGBO(24, 41, 163, 1))
+                        ? Icon(
+                            Icons.camera_alt,
+                            size: 32,
+                            color: Color.fromRGBO(24, 41, 163, 1),
+                          )
                         : null,
                   ),
                 ),
                 SizedBox(height: 8),
                 Text(
                   localizations?.addPhoto ?? 'Agregar foto (opcional)',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 24),
                 Text(
@@ -151,7 +157,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: Color.fromRGBO(231, 182, 43, 1),
                     ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -162,8 +169,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
-                      return localizations?.nameRequired ??
-                          'Nombre requerido';
+                      return localizations?.nameRequired ?? 'Nombre requerido';
                     }
                     return null;
                   },
@@ -188,7 +194,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       color: Color.fromRGBO(231, 182, 43, 1),
                     ),
                     border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
                       borderSide: BorderSide(
@@ -221,9 +228,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Confirmar contraseña
                 CustomPasswordField(
                   controller: _confirmPasswordController,
-                  label: localizations?.confirmPassword ??
-                      'Confirmar contraseña',
-                  errorMessage: localizations?.passwordRequired ??
+                  label:
+                      localizations?.confirmPassword ?? 'Confirmar contraseña',
+                  errorMessage:
+                      localizations?.passwordRequired ??
                       'Confirma tu contraseña',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -267,8 +275,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Text(
-                    localizations?.alreadyHaveAccount ??
-                        'Ya tengo una cuenta',
+                    localizations?.alreadyHaveAccount ?? 'Ya tengo una cuenta',
                     style: TextStyle(
                       fontSize: 16,
                       color: Color.fromRGBO(231, 182, 43, 1),

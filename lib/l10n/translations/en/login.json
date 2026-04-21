@@ -15,5 +15,15 @@
   "addPhoto": "Add photo (optional)",
   "registrationError": "Registration error. Try again.",
   "passwordMismatch": "Passwords do not match",
-  "alreadyHaveAccount": "I already have an account"
+  "alreadyHaveAccount": "I already have an account",
+  "accountPendingApproval": "Account pending approval",
+  "accountPendingApprovalMessage": "Your account was created successfully. An administrator must approve it before you can sign in.",
+  "validateActivation": "Validate activation",
+  "accountStillPending": "Your account has not been activated yet. Please try again later.",
+  "backToLogin": "Back to login",
+  "ok": "Got it",
+  "paymentNumberLabel": "Send the payment to this number:",
+  "copyNumber": "Copy number",
+  "numberCopied": "Number copied",
+  "paymentNoteInstruction": "Important: add your name or email in the payment note so we can identify your transfer and activate your account."
 }

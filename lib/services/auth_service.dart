@@ -22,8 +22,10 @@ class AuthService {
   Session? get currentSession => supabase.auth.currentSession;
 
   /// Fetch the user profile for the currently logged-in user.
-  /// Uses RPC to link auth_uid (bypasses RLS), then fetches profile.
-  /// Returns null if user not found or is_active is false.
+  /// Uses RPC to link auth_uid (bypasses RLS), then fetches profile by auth_uid.
+  /// Returns null solo si el usuario no existe en la tabla `users`.
+  /// El flag `is_active` se devuelve en el perfil para que el caller decida
+  /// si puede entrar al home o debe ver la pantalla de pendiente.
   Future<Map<String, dynamic>?> getCurrentUserProfile() async {
     final user = currentUser;
     if (user == null) return null;
@@ -34,8 +36,7 @@ class AuthService {
     final response = await supabase
         .from('users')
         .select('*')
-        .eq('email', user.email!)
-        .eq('is_active', true)
+        .eq('auth_uid', user.id)
         .maybeSingle();
 
     return response;
@@ -59,18 +60,14 @@ class AuthService {
 
     // 2. Hacer login para tener sesión activa (signUp puede no auto-loguear)
     if (response.session == null) {
-      await supabase.auth.signInWithPassword(
-        email: email,
-        password: password,
-      );
+      await supabase.auth.signInWithPassword(email: email, password: password);
     }
 
     // 3. Crear perfil en tabla users via RPC (bypasa RLS)
-    await supabase.rpc('register_user', params: {
-      'p_full_name': fullName,
-      'p_email': email,
-      'p_phone': phone,
-    });
+    await supabase.rpc(
+      'register_user',
+      params: {'p_full_name': fullName, 'p_email': email, 'p_phone': phone},
+    );
 
     // 4. Vincular auth_uid
     await supabase.rpc('link_auth_uid');

@@ -19,7 +19,7 @@ class FloatingMenu extends StatelessWidget {
         borderRadius: BorderRadius.circular(35),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -31,8 +31,8 @@ class FloatingMenu extends StatelessWidget {
           _menuItem(Icons.home_outlined, 0),
           _menuItem(Icons.calendar_today_outlined, 1),
           _menuItem(Icons.favorite_outline, 2),
-          _menuItem(Icons.person_outline, 3),
-          _menuItem(Icons.logout, 4),
+          _menuItem(Icons.newspaper_outlined, 3),
+          _menuItem(Icons.person_outline, 4),
         ],
       ),
     );

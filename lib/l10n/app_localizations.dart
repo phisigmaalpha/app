@@ -91,6 +91,16 @@ class AppLocalizations {
   String get registrationError => translate('registrationError');
   String get passwordMismatch => translate('passwordMismatch');
   String get alreadyHaveAccount => translate('alreadyHaveAccount');
+  String get accountPendingApproval => translate('accountPendingApproval');
+  String get accountPendingApprovalMessage => translate('accountPendingApprovalMessage');
+  String get validateActivation => translate('validateActivation');
+  String get accountStillPending => translate('accountStillPending');
+  String get backToLogin => translate('backToLogin');
+  String get ok => translate('ok');
+  String get paymentNumberLabel => translate('paymentNumberLabel');
+  String get copyNumber => translate('copyNumber');
+  String get numberCopied => translate('numberCopied');
+  String get paymentNoteInstruction => translate('paymentNoteInstruction');
 
   // Subscription translations
   // Agrega aquí los getters para tus traducciones de subscription

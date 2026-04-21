@@ -18,7 +18,7 @@ class ProfileCard extends StatelessWidget {
         border: Border.all(color: const Color.fromRGBO(24, 41, 163, 0.2)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 5,
             offset: const Offset(0, 3),
           ),
@@ -28,7 +28,6 @@ class ProfileCard extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: Row(
           children: [
-            // Contenido principal
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -41,16 +40,18 @@ class ProfileCard extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    option.description ?? "",
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color.fromRGBO(24, 41, 163, 1),
+                  if (option.description != null &&
+                      option.description!.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    Text(
+                      option.description!,
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Color.fromRGBO(24, 41, 163, 1),
+                      ),
+                      overflow: TextOverflow.fade,
                     ),
-                    overflow: TextOverflow.fade,
-                  ),
-                  const SizedBox(height: 6),
+                  ],
                 ],
               ),
             ),

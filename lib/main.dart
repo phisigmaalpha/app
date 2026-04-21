@@ -97,17 +97,19 @@ class _SplashScreenState extends State<SplashScreen> {
       if (!mounted) return;
 
       if (profile == null) {
-        // Usuario inactivo o no existe
+        // Usuario autenticado pero sin fila en tabla users
         await supabase.auth.signOut();
         Navigator.pushReplacementNamed(context, '/login');
       } else {
+        final isActive = profile['is_active'] as bool? ?? false;
         final expiresAt = profile['subscription_expires_at'] as String?;
         final isSubscribed = expiresAt != null &&
             DateTime.parse(expiresAt).isAfter(DateTime.now());
 
-        if (isSubscribed) {
+        if (isActive && isSubscribed) {
           Navigator.pushReplacementNamed(context, '/home');
         } else {
+          // Inactivo o sin suscripción → membership (maneja ambos casos)
           Navigator.pushReplacementNamed(context, '/membership');
         }
       }
@@ -126,18 +128,11 @@ class _SplashScreenState extends State<SplashScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
+            Image.asset(
+              'assets/logo.png',
               width: 120,
               height: 120,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.orange[400],
-                border: Border.all(
-                  color: const Color.fromRGBO(231, 182, 43, 1),
-                  width: 4,
-                ),
-              ),
-              child: const Icon(Icons.school, size: 70, color: Colors.white),
+              fit: BoxFit.contain,
             ),
             const SizedBox(height: 30),
             const CircularProgressIndicator(

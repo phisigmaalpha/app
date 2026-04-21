@@ -37,11 +37,11 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (profile == null) {
-        // Usuario inactivo o no existe en tabla users
+        // Usuario autenticado pero sin fila en tabla users
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              localizations?.invalidCredentials ?? 'Cuenta inactiva',
+              localizations?.invalidCredentials ?? 'Credenciales inválidas',
             ),
           ),
         );
@@ -50,13 +50,15 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
+      final isActive = profile['is_active'] as bool? ?? false;
       final expiresAt = profile['subscription_expires_at'] as String?;
       final isSubscribed = expiresAt != null &&
           DateTime.parse(expiresAt).isAfter(DateTime.now());
 
-      if (isSubscribed) {
+      if (isActive && isSubscribed) {
         Navigator.pushReplacementNamed(context, '/home');
       } else {
+        // Inactivo (pendiente de aprobación) o sin suscripción → membership
         Navigator.pushReplacementNamed(context, '/membership');
       }
     } catch (e) {
