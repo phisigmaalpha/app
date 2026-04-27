@@ -3,16 +3,18 @@ import 'package:flutter/material.dart';
 class HomeNavbar extends StatelessWidget {
   final int selectedIndex;
   final String userName;
+  final TextEditingController? searchController;
 
   const HomeNavbar({
     super.key,
     required this.selectedIndex,
     this.userName = '',
+    this.searchController,
   });
 
   @override
   Widget build(BuildContext context) {
-    final isProfileTab = selectedIndex == 3;
+    final isProfileTab = selectedIndex == 4;
 
     return Container(
       width: double.infinity,
@@ -47,14 +49,15 @@ class HomeNavbar extends StatelessWidget {
                   borderRadius: BorderRadius.circular(30),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.3),
+                      color: Colors.black.withValues(alpha: 0.3),
                       blurRadius: 5,
                       offset: const Offset(0, 3),
                     ),
                   ],
                 ),
-                child: const TextField(
-                  decoration: InputDecoration(
+                child: TextField(
+                  controller: searchController,
+                  decoration: const InputDecoration(
                     hintText: "Buscar...",
                     prefixIcon: Icon(Icons.search),
                     border: InputBorder.none,
@@ -74,7 +77,7 @@ class HomeNavbar extends StatelessWidget {
         ? userName.split(' ').first
         : 'Usuario';
 
-    return selectedIndex != 3
+    return selectedIndex != 4
         ? Row(
             children: [
               const CircleAvatar(

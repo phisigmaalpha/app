@@ -147,6 +147,87 @@ class ChapterService {
     }
   }
 
+  /// Get the current user's internal users.id via their auth_uid.
+  Future<String?> _getCurrentUserId() async {
+    final authUid = supabase.auth.currentUser?.id;
+    if (authUid == null) return null;
+    final response = await supabase
+        .from('users')
+        .select('id')
+        .eq('auth_uid', authUid)
+        .maybeSingle();
+    return response?['id'] as String?;
+  }
+
+  /// Returns the current user's membership status for a chapter:
+  /// null = not a member, 'pendiente', 'activo', etc.
+  Future<String?> getMembershipStatus(String chapterId) async {
+    try {
+      final userId = await _getCurrentUserId();
+      if (userId == null) return null;
+      final response = await supabase
+          .from('chapter_members')
+          .select('status')
+          .eq('chapter_id', chapterId)
+          .eq('user_id', userId)
+          .maybeSingle();
+      return response?['status'] as String?;
+    } catch (e) {
+      debugPrint('Error checking membership: $e');
+      return null;
+    }
+  }
+
+  /// Send a join request for the current user to a chapter.
+  /// Uses SECURITY DEFINER RPC to bypass RLS (only admins can write chapter_members directly).
+  Future<void> joinChapter(String chapterId) async {
+    await supabase.rpc(
+      'request_chapter_membership',
+      params: {'p_chapter_id': chapterId},
+    );
+  }
+
+  /// Fetch the chapters the current user actively belongs to.
+  Future<List<ChapterModel>> getUserChapters() async {
+    try {
+      final userId = await _getCurrentUserId();
+      if (userId == null) return [];
+      final response = await supabase
+          .from('chapter_members')
+          .select(
+            'status, chapter:chapters(id, type, name, description, history, logo_path, is_active)',
+          )
+          .eq('user_id', userId)
+          .eq('status', 'activo');
+
+      final chapters = <ChapterModel>[];
+      for (final item in response as List) {
+        final chapter = item['chapter'] as Map<String, dynamic>?;
+        if (chapter == null) continue;
+        final logoPath = chapter['logo_path'] as String?;
+        String? logoUrl;
+        if (logoPath != null) {
+          logoUrl = supabase.storage.from('documents').getPublicUrl(logoPath);
+        }
+        chapters.add(
+          ChapterModel(
+            id: chapter['id'],
+            name: chapter['name'],
+            type: chapter['type'] ?? 'activo',
+            description: chapter['description'],
+            history: chapter['history'],
+            logoUrl: logoUrl,
+            members: 0,
+          ),
+        );
+      }
+      return chapters;
+    } catch (e) {
+      debugPrint('Error fetching user chapters: $e');
+      return [];
+    }
+  }
+
   /// Fetch events for a specific chapter.
   Future<List<EventModel>> getChapterEvents(String chapterId) async {
     try {

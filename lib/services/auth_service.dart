@@ -4,10 +4,16 @@ import 'package:app/services/supabase_config.dart';
 class AuthService {
   /// Sign in with email and password using Supabase Auth.
   Future<AuthResponse> signIn(String email, String password) async {
-    return await supabase.auth.signInWithPassword(
+    final response = await supabase.auth.signInWithPassword(
       email: email,
       password: password,
     );
+
+    print(":::::::::::::::::::::::::signIn response:::::::::::::::::::::::::");
+    print(response);
+    print(email);
+    print(password);
+    return response;
   }
 
   /// Sign out the current user.
@@ -60,7 +66,10 @@ class AuthService {
 
     // 2. Hacer login para tener sesión activa (signUp puede no auto-loguear)
     if (response.session == null) {
-      await supabase.auth.signInWithPassword(email: email, password: password);
+      final response = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
     }
 
     // 3. Crear perfil en tabla users via RPC (bypasa RLS)

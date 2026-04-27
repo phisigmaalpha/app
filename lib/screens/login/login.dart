@@ -52,7 +52,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
       final isActive = profile['is_active'] as bool? ?? false;
       final expiresAt = profile['subscription_expires_at'] as String?;
-      final isSubscribed = expiresAt != null &&
+      final isSubscribed =
+          expiresAt != null &&
           DateTime.parse(expiresAt).isAfter(DateTime.now());
 
       if (isActive && isSubscribed) {
@@ -168,9 +169,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => RegisterScreen(),
-                      ),
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
                     );
                   },
                   child: Text(

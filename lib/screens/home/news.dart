@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:app/services/news_service.dart';
 
 class NewsScreen extends StatefulWidget {
-  const NewsScreen({super.key});
+  final String searchQuery;
+
+  const NewsScreen({super.key, this.searchQuery = ''});
 
   @override
   State<NewsScreen> createState() => _NewsScreenState();
@@ -57,11 +59,20 @@ class _NewsScreenState extends State<NewsScreen> {
       );
     }
 
+    final q = widget.searchQuery.toLowerCase();
+    final filtered = q.isEmpty
+        ? _news
+        : _news
+            .where((n) =>
+                n.title.toLowerCase().contains(q) ||
+                n.content.toLowerCase().contains(q))
+            .toList();
+
     return RefreshIndicator(
       onRefresh: _loadNews,
       child: ListView.builder(
         padding: EdgeInsets.fromLTRB(20, 4, 20, 100),
-        itemCount: _news.length + 1,
+        itemCount: filtered.length + 1,
         itemBuilder: (context, index) {
           if (index == 0) {
             return Padding(
@@ -77,7 +88,7 @@ class _NewsScreenState extends State<NewsScreen> {
             );
           }
 
-          final item = _news[index - 1];
+          final item = filtered[index - 1];
           return _buildNewsCard(item);
         },
       ),

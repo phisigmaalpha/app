@@ -1,0 +1,13 @@
+{
+  "joinChapter": "Unirse",
+  "joinChapterConfirmTitle": "Unirse al capítulo",
+  "joinChapterConfirmMessage": "¿Deseas unirte a este capítulo?",
+  "joinChapterSuccess": "Te has unido al capítulo exitosamente",
+  "joinChapterError": "Error al enviar la solicitud",
+  "alreadyMember": "Miembro",
+  "pendingMember": "Pendiente",
+  "myChapters": "Mis capítulos",
+  "noMyChapters": "Aún no perteneces a ningún capítulo",
+  "cancel": "Cancelar",
+  "confirm": "Confirmar"
+}

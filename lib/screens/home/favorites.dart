@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 
 class FavoritesScreen extends StatefulWidget {
   final Future<void> Function(String eventId) onFavoriteToggled;
+  final String searchQuery;
 
   const FavoritesScreen({
     super.key,
     required this.onFavoriteToggled,
+    this.searchQuery = '',
   });
 
   @override
@@ -58,6 +60,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       );
     }
 
+    final q = widget.searchQuery.toLowerCase();
+    final filtered = q.isEmpty
+        ? _favoriteEvents
+        : _favoriteEvents
+            .where((e) =>
+                e.title.toLowerCase().contains(q) ||
+                e.place.toLowerCase().contains(q))
+            .toList();
+
     return RefreshIndicator(
       onRefresh: _loadFavorites,
       child: SingleChildScrollView(
@@ -81,34 +92,37 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 child: Center(
                   child: Column(
                     children: [
-                      Icon(
-                        Icons.favorite_border,
-                        size: 64,
-                        color: Color.fromRGBO(231, 182, 43, 0.5),
-                      ),
+                      Icon(Icons.favorite_border,
+                          size: 64, color: Color.fromRGBO(231, 182, 43, 0.5)),
                       SizedBox(height: 16),
-                      Text(
-                        "No tienes eventos favoritos",
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
+                      Text("No tienes eventos favoritos",
+                          style: TextStyle(color: Colors.grey, fontSize: 16)),
                       SizedBox(height: 8),
-                      Text(
-                        "Marca eventos como favoritos para verlos aquí",
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
+                      Text("Marca eventos como favoritos para verlos aquí",
+                          style: TextStyle(color: Colors.grey, fontSize: 14)),
                     ],
                   ),
                 ),
               )
+            else if (filtered.isEmpty)
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 40),
+                child: Center(
+                  child: Text("Sin resultados",
+                      style: TextStyle(color: Colors.grey, fontSize: 16)),
+                ),
+              )
             else
-              ..._favoriteEvents.map((event) => EventCard(
-                    event: event,
-                    isFavorite: true,
-                    onFavoriteToggled: () async {
-                      await widget.onFavoriteToggled(event.id);
-                      _loadFavorites();
-                    },
-                  )),
+              ...filtered.map(
+                (event) => EventCard(
+                  event: event,
+                  isFavorite: true,
+                  onFavoriteToggled: () async {
+                    await widget.onFavoriteToggled(event.id);
+                    _loadFavorites();
+                  },
+                ),
+              ),
             const SizedBox(height: 100),
           ],
         ),

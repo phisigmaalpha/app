@@ -22,6 +22,7 @@ class AppLocalizations {
       'login',
       'passwords',
       'subscription',
+      'chapters',
     ];
 
     // Cargar y combinar todos los JSONs
@@ -104,6 +105,19 @@ class AppLocalizations {
 
   // Subscription translations
   // Agrega aquí los getters para tus traducciones de subscription
+
+  // Chapter translations
+  String get joinChapter => translate('joinChapter');
+  String get joinChapterConfirmTitle => translate('joinChapterConfirmTitle');
+  String get joinChapterConfirmMessage => translate('joinChapterConfirmMessage');
+  String get joinChapterSuccess => translate('joinChapterSuccess');
+  String get joinChapterError => translate('joinChapterError');
+  String get alreadyMember => translate('alreadyMember');
+  String get pendingMember => translate('pendingMember');
+  String get myChapters => translate('myChapters');
+  String get noMyChapters => translate('noMyChapters');
+  String get cancel => translate('cancel');
+  String get confirm => translate('confirm');
 }
 
 class _AppLocalizationsDelegate

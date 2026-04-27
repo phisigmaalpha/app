@@ -146,7 +146,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(
-            Color.fromRGBO(231, 182, 43, 1),
+            Color.fromRGBO(24, 41, 163, 1),
           ),
         ),
       );

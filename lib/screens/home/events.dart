@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 class EventSection extends StatefulWidget {
   final Set<String> favoriteIds;
   final Future<void> Function(String eventId) onFavoriteToggled;
+  final String searchQuery;
 
   const EventSection({
     super.key,
     required this.favoriteIds,
     required this.onFavoriteToggled,
+    this.searchQuery = '',
   });
 
   @override
@@ -54,9 +56,13 @@ class _EventSectionState extends State<EventSection> {
       );
     }
 
-    // final favoriteEvents = _upcomingEvents
-    //     .where((e) => widget.favoriteIds.contains(e.id))
-    //     .toList();
+    final q = widget.searchQuery.toLowerCase();
+    final filtered = q.isEmpty
+        ? _upcomingEvents
+        : _upcomingEvents.where((e) =>
+            e.title.toLowerCase().contains(q) ||
+            e.place.toLowerCase().contains(q) ||
+            e.tags.any((t) => t.toLowerCase().contains(q))).toList();
 
     return RefreshIndicator(
       onRefresh: _loadEvents,
@@ -75,7 +81,7 @@ class _EventSectionState extends State<EventSection> {
               ),
             ),
             const SizedBox(height: 10),
-            if (_upcomingEvents.isEmpty)
+            if (filtered.isEmpty)
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 40),
                 child: Center(
@@ -86,7 +92,7 @@ class _EventSectionState extends State<EventSection> {
                 ),
               )
             else
-              ..._upcomingEvents.map(
+              ...filtered.map(
                 (event) => EventCard(
                   event: event,
                   isFavorite: widget.favoriteIds.contains(event.id),

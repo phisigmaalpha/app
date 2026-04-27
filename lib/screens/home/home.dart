@@ -9,6 +9,7 @@ import 'package:app/services/event_service.dart';
 import 'package:app/services/favorites_service.dart';
 import 'package:app/services/auth_service.dart';
 import 'package:app/services/supabase_config.dart';
+import 'package:app/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'components/navbar.dart';
 import 'components/menu.dart';
@@ -28,6 +29,10 @@ class _HomeScreenState extends State<HomeScreen> {
   final _favoritesService = FavoritesService();
   final _authService = AuthService();
 
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  List<ChapterModel> _myChapters = [];
   List<ChapterModel> _activosChapters = [];
   List<ChapterModel> _militantesChapters = [];
   EventModel? _featuredEvent;
@@ -39,11 +44,26 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _loadData();
+    _searchController.addListener(() {
+      setState(() => _searchQuery = _searchController.text.trim().toLowerCase());
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadData() async {
     final activos = await _chapterService.getChapters(type: 'activo');
     final militantes = await _chapterService.getChapters(type: 'militante');
+    List<ChapterModel> myChapters = [];
+    try {
+      myChapters = await _chapterService.getUserChapters();
+    } catch (e) {
+      debugPrint('Error loading user chapters: $e');
+    }
 
     EventModel? featured;
     try {
@@ -69,6 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (!mounted) return;
     setState(() {
+      _myChapters = myChapters;
       _activosChapters = activos;
       _militantesChapters = militantes;
       _featuredEvent = featured;
@@ -86,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void _onMenuItemSelected(int index) {
     setState(() {
       _selectedIndex = index;
+      _searchController.clear();
     });
   }
 
@@ -97,7 +119,11 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Column(
             children: [
-              HomeNavbar(selectedIndex: _selectedIndex, userName: _userName),
+              HomeNavbar(
+                selectedIndex: _selectedIndex,
+                userName: _userName,
+                searchController: _searchController,
+              ),
               Expanded(
                 child: _isLoading
                     ? const Center(
@@ -111,49 +137,70 @@ class _HomeScreenState extends State<HomeScreen> {
                         index: _selectedIndex,
                         children: [
                           // 0: Home
-                          RefreshIndicator(
-                            onRefresh: _loadData,
-                            child: SingleChildScrollView(
-                              physics: const AlwaysScrollableScrollPhysics(),
-                              child: Column(
-                                children: [
-                                  ContainerSection(
-                                    title: "Capítulos activos",
-                                    type: 'chapter',
-                                    chapters: _activosChapters,
+                          Builder(
+                            builder: (context) {
+                              final l10n = AppLocalizations.of(context);
+                              bool matchesQuery(String name) =>
+                                  _searchQuery.isEmpty ||
+                                  name.toLowerCase().contains(_searchQuery);
+                              final myFiltered = _myChapters.where((c) => matchesQuery(c.name)).toList();
+                              final activosFiltered = _activosChapters.where((c) => matchesQuery(c.name)).toList();
+                              final militantesFiltered = _militantesChapters.where((c) => matchesQuery(c.name)).toList();
+                              final showFeatured = _featuredEvent != null &&
+                                  matchesQuery(_featuredEvent!.title);
+                              return RefreshIndicator(
+                                onRefresh: _loadData,
+                                child: SingleChildScrollView(
+                                  physics: const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    children: [
+                                      if (myFiltered.isNotEmpty)
+                                        ContainerSection(
+                                          title: l10n?.myChapters ?? 'Mis capítulos',
+                                          type: 'chapter',
+                                          chapters: myFiltered,
+                                        ),
+                                      ContainerSection(
+                                        title: 'Capítulos activos',
+                                        type: 'chapter',
+                                        chapters: activosFiltered,
+                                      ),
+                                      SizedBox(height: 10),
+                                      if (militantesFiltered.isNotEmpty)
+                                        ContainerSection(
+                                          title: 'Capítulos militantes',
+                                          type: 'chapter',
+                                          chapters: militantesFiltered,
+                                        ),
+                                      const SizedBox(height: 10),
+                                      if (showFeatured)
+                                        ContainerSection(
+                                          title: 'Próximo evento destacado',
+                                          type: 'event',
+                                          events: [_featuredEvent!],
+                                          favoriteIds: _favoriteIds,
+                                          onFavoriteToggled: _onFavoriteToggled,
+                                        ),
+                                      const SizedBox(height: 100),
+                                    ],
                                   ),
-                                  SizedBox(height: 10),
-                                  if (_militantesChapters.isNotEmpty)
-                                    ContainerSection(
-                                      title: "Capítulos militantes",
-                                      type: 'chapter',
-                                      chapters: _militantesChapters,
-                                    ),
-                                  const SizedBox(height: 10),
-                                  if (_featuredEvent != null)
-                                    ContainerSection(
-                                      title: "Próximo evento destacado",
-                                      type: 'event',
-                                      events: [_featuredEvent!],
-                                      favoriteIds: _favoriteIds,
-                                      onFavoriteToggled: _onFavoriteToggled,
-                                    ),
-                                  const SizedBox(height: 100),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           ),
                           // 1: Eventos
                           EventSection(
                             favoriteIds: _favoriteIds,
                             onFavoriteToggled: _onFavoriteToggled,
+                            searchQuery: _searchQuery,
                           ),
                           // 2: Favoritos
                           FavoritesScreen(
                             onFavoriteToggled: _onFavoriteToggled,
+                            searchQuery: _searchQuery,
                           ),
                           // 3: Noticias
-                          const NewsScreen(),
+                          NewsScreen(searchQuery: _searchQuery),
                           // 4: Perfil
                           const ProfileScreen(),
                         ],
