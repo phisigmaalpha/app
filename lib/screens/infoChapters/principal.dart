@@ -135,7 +135,7 @@ class _PrincipalScreenState extends State<PrincipalScreen> {
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
-                      "${widget.chapter.members} integrantes",
+                      "${widget.chapter.members} ${l10n?.translate('membersLabel') ?? 'integrantes'}",
                       style: const TextStyle(
                         color: Colors.blueGrey,
                         fontSize: 14,

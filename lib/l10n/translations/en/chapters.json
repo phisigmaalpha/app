@@ -9,5 +9,10 @@
   "myChapters": "My chapters",
   "noMyChapters": "You don't belong to any chapter yet",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "tabHistory": "History",
+  "tabMembers": "Members",
+  "tabEvents": "Events",
+  "tabDocuments": "Documents",
+  "membersLabel": "members"
 }

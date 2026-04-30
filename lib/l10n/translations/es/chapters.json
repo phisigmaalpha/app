@@ -9,5 +9,10 @@
   "myChapters": "Mis capítulos",
   "noMyChapters": "Aún no perteneces a ningún capítulo",
   "cancel": "Cancelar",
-  "confirm": "Confirmar"
+  "confirm": "Confirmar",
+  "tabHistory": "Historia",
+  "tabMembers": "Integrantes",
+  "tabEvents": "Eventos",
+  "tabDocuments": "Documentación",
+  "membersLabel": "integrantes"
 }
