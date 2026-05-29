@@ -50,6 +50,16 @@ class EventCard extends StatelessWidget {
     );
   }
 
+  /// Convierte la hora almacenada ("HH:mm:ss" o "HH:mm") a formato 12 horas
+  /// (p. ej. "2:30 p. m."). Si no se puede parsear, devuelve el valor original.
+  String _formatTime12h() {
+    final parts = event.eventTime.split(':');
+    final hour = int.tryParse(parts.isNotEmpty ? parts[0] : '');
+    if (hour == null) return event.eventTime;
+    final minute = parts.length > 1 ? int.tryParse(parts[1]) ?? 0 : 0;
+    return DateFormat('h:mm a').format(DateTime(0, 1, 1, hour, minute));
+  }
+
   void _addToCalendar() {
     final timeParts = event.eventTime.split(':');
     final hour = int.tryParse(timeParts[0]) ?? 0;
@@ -169,7 +179,7 @@ class EventCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        event.eventTime,
+                        _formatTime12h(),
                         style: const TextStyle(
                           fontSize: 13,
                           color: Colors.grey,

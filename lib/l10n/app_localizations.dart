@@ -23,6 +23,7 @@ class AppLocalizations {
       'passwords',
       'subscription',
       'chapters',
+      'profile',
     ];
 
     // Cargar y combinar todos los JSONs
@@ -102,6 +103,7 @@ class AppLocalizations {
   String get copyNumber => translate('copyNumber');
   String get numberCopied => translate('numberCopied');
   String get paymentNoteInstruction => translate('paymentNoteInstruction');
+  String get activationDelayNote => translate('activationDelayNote');
 
   // Subscription translations
   // Agrega aquí los getters para tus traducciones de subscription
@@ -118,6 +120,15 @@ class AppLocalizations {
   String get noMyChapters => translate('noMyChapters');
   String get cancel => translate('cancel');
   String get confirm => translate('confirm');
+
+  // Profile translations
+  String get deleteAccount => translate('deleteAccount');
+  String get deleteAccountDescription => translate('deleteAccountDescription');
+  String get deleteAccountConfirmTitle => translate('deleteAccountConfirmTitle');
+  String get deleteAccountConfirmMessage => translate('deleteAccountConfirmMessage');
+  String get deleteAccountConfirmAction => translate('deleteAccountConfirmAction');
+  String get accountDeletedMessage => translate('accountDeletedMessage');
+  String get deleteAccountError => translate('deleteAccountError');
 }
 
 class _AppLocalizationsDelegate

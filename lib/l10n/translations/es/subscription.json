@@ -1,1 +1,9 @@
-{}
+{
+  "subscriptionTitle": "Suscripción Anual",
+  "subscriptionDesc": "Para acceder a la app necesitas una suscripción activa.",
+  "perYear": "por año",
+  "athPhone": "Número de teléfono registrado",
+  "payWithATH": "Pagar con ATH Móvil",
+  "securePayment": "Pago seguro",
+  "logout": "Cerrar sesión"
+}

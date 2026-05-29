@@ -1,0 +1,9 @@
+{
+  "deleteAccount": "Delete account",
+  "deleteAccountDescription": "Permanently delete your account and all your data",
+  "deleteAccountConfirmTitle": "Delete account?",
+  "deleteAccountConfirmMessage": "This action is irreversible. Your profile, memberships, and access to the app will be permanently removed.",
+  "deleteAccountConfirmAction": "Yes, delete my account",
+  "accountDeletedMessage": "Account deleted",
+  "deleteAccountError": "Failed to delete account"
+}

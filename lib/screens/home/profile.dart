@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:app/services/auth_service.dart';
+import 'package:app/services/account_service.dart';
 import 'package:app/services/supabase_config.dart';
+import 'package:app/l10n/app_localizations.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,10 +13,12 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   final _authService = AuthService();
+  final _accountService = AccountService();
   Map<String, dynamic>? _profile;
   bool _isLoading = true;
   bool _isEditing = false;
   bool _isSaving = false;
+  bool _isDeleting = false;
 
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -165,6 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final isSubscribed =
         subscriptionExpires != null &&
         DateTime.parse(subscriptionExpires).isAfter(DateTime.now());
+    final localizations = AppLocalizations.of(context);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
@@ -187,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(width: 8),
                 Text(
                   isSubscribed
-                      ? 'Activa hasta ${_formatDate(subscriptionExpires!)}'
+                      ? 'Activa hasta ${_formatDate(subscriptionExpires)}'
                       : 'Sin suscripción activa',
                   style: TextStyle(
                     fontSize: 14,
@@ -258,10 +263,97 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
           ),
+          SizedBox(height: 12),
+
+          // Eliminar cuenta
+          SizedBox(
+            width: double.infinity,
+            child: TextButton.icon(
+              onPressed: _isDeleting ? null : _confirmDeleteAccount,
+              icon: _isDeleting
+                  ? SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        color: Colors.red[700],
+                        strokeWidth: 2,
+                      ),
+                    )
+                  : Icon(Icons.delete_forever, color: Colors.red[700]),
+              label: Text(
+                localizations?.deleteAccount ?? 'Delete account',
+                style: TextStyle(
+                  color: Colors.red[700],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
           const SizedBox(height: 100),
         ],
       ),
     );
+  }
+
+  Future<void> _confirmDeleteAccount() async {
+    final localizations = AppLocalizations.of(context);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(
+          localizations?.deleteAccountConfirmTitle ?? 'Delete account?',
+        ),
+        content: Text(
+          localizations?.deleteAccountConfirmMessage ??
+              'This action is irreversible.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(localizations?.cancel ?? 'Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(
+              localizations?.deleteAccountConfirmAction ?? 'Delete',
+            ),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isDeleting = true);
+    try {
+      await _accountService.deleteAccount();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            localizations?.accountDeletedMessage ?? 'Account deleted',
+          ),
+        ),
+      );
+      Navigator.pushNamedAndRemoveUntil(context, '/login', (_) => false);
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isDeleting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            localizations?.deleteAccountError ?? 'Failed to delete account',
+          ),
+        ),
+      );
+    }
   }
 
   void _showLogoutDialog() {

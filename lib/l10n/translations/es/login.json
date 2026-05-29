@@ -22,8 +22,9 @@
   "accountStillPending": "Tu cuenta aún no ha sido activada. Intenta más tarde.",
   "backToLogin": "Volver al login",
   "ok": "Entendido",
-  "paymentNumberLabel": "Envía el pago al siguiente número:",
+  "paymentNumberLabel": "Realiza la transferencia al siguiente número de Phi Sigma Alpha:",
   "copyNumber": "Copiar número",
   "numberCopied": "Número copiado",
-  "paymentNoteInstruction": "Importante: agrega tu nombre o correo electrónico en la nota del pago para que podamos identificar tu transferencia y activar tu cuenta."
+  "paymentNoteInstruction": "Importante: agrega tu nombre o correo electrónico en la nota del pago para que podamos identificar tu transferencia y activar tu cuenta.",
+  "activationDelayNote": "Si en 24 horas tu cuenta no ha sido activada, por favor envía un mensaje a este número de Phi Sigma Alpha con tu correo, nombre y fecha de pago."
 }

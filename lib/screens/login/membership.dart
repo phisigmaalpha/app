@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -17,12 +19,21 @@ class _MembershipState extends State<Membership> {
   bool _paymentInitiated = false;
   bool _isValidating = false;
 
+  // Tutorial guiado: 0 = resaltar botón copiar, 1 = resaltar botón ATH Móvil,
+  // 2 = tutorial completado (sin animaciones).
+  int _tutorialStep = 0;
+
   Future<void> _openATHMovil() async {
     // El prefill (phone/amount/note) requiere cuenta ATH Business con
     // publicToken. Sin eso, solo podemos abrir la app en su pantalla por
     // defecto. El scheme real de ATH Móvil es `athm://`, extraído del SDK
     // open-source de Evertec (athmovil-ios-sdk).
     final athUri = Uri.parse('athm://');
+
+    // Avanza el tutorial: ya se pulsó el botón de ATH Móvil, lo damos por hecho.
+    if (_tutorialStep == 1) {
+      setState(() => _tutorialStep = 2);
+    }
 
     if (await canLaunchUrl(athUri)) {
       await launchUrl(athUri);
@@ -38,6 +49,10 @@ class _MembershipState extends State<Membership> {
     final localizations = AppLocalizations.of(context);
     await Clipboard.setData(ClipboardData(text: _athMovilPhone));
     if (!mounted) return;
+    // Avanza el tutorial: tras copiar, resaltamos el botón de ATH Móvil.
+    if (_tutorialStep == 0) {
+      setState(() => _tutorialStep = 1);
+    }
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(localizations?.numberCopied ?? 'Número copiado'),
@@ -216,14 +231,17 @@ class _MembershipState extends State<Membership> {
                       ),
                     ),
                     SizedBox(width: 8),
-                    IconButton(
-                      onPressed: _copyPhoneNumber,
-                      icon: Icon(Icons.copy, size: 20),
-                      color: Color(0xFF1A3D96),
-                      tooltip:
-                          localizations?.copyNumber ?? 'Copiar número',
-                      constraints: BoxConstraints(),
-                      padding: EdgeInsets.all(6),
+                    _ShakeAttention(
+                      active: _tutorialStep == 0,
+                      child: IconButton(
+                        onPressed: _copyPhoneNumber,
+                        icon: Icon(Icons.copy, size: 20),
+                        color: Color(0xFF1A3D96),
+                        tooltip:
+                            localizations?.copyNumber ?? 'Copiar número',
+                        constraints: BoxConstraints(),
+                        padding: EdgeInsets.all(6),
+                      ),
                     ),
                   ],
                 ),
@@ -248,33 +266,64 @@ class _MembershipState extends State<Membership> {
                   color: Color(0xFF1A3D96),
                 ),
               ),
+              SizedBox(height: 16),
+              Container(
+                padding: EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Color.fromRGBO(231, 182, 43, 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Color.fromRGBO(231, 182, 43, 0.4)),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Icon(Icons.warning_amber_rounded,
+                        size: 18, color: Color(0xFFB8860B)),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        localizations?.activationDelayNote ??
+                            'Si en 24 horas tu cuenta no ha sido activada, por favor envía un mensaje a este número de Phi Sigma Alpha con tu correo, nombre y fecha de pago.',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.grey[800],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ],
           ),
         ),
         SizedBox(height: 24),
-        SizedBox(
-          width: double.infinity,
-          height: 56,
-          child: ElevatedButton(
-            onPressed: _openATHMovil,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Color(0xFFEC7625),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              elevation: 2,
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.payment, size: 24),
-                SizedBox(width: 8),
-                Text(
-                  'Abrir ATH Movil',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        _ShakeAttention(
+          active: _tutorialStep == 1,
+          child: SizedBox(
+            width: double.infinity,
+            height: 56,
+            child: ElevatedButton(
+              onPressed: _openATHMovil,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFEC7625),
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
-              ],
+                elevation: 2,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.payment, size: 24),
+                  SizedBox(width: 8),
+                  Text(
+                    'Abrir ATH Movil',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -407,6 +456,79 @@ class _MembershipState extends State<Membership> {
         ),
         SizedBox(height: 40),
       ],
+    );
+  }
+}
+
+/// Envuelve un widget y lo hace "vibrar" (shake horizontal + háptica rítmica)
+/// mientras [active] sea true, para guiar al usuario en el tutorial de pago.
+class _ShakeAttention extends StatefulWidget {
+  final Widget child;
+  final bool active;
+
+  const _ShakeAttention({required this.child, required this.active});
+
+  @override
+  State<_ShakeAttention> createState() => _ShakeAttentionState();
+}
+
+class _ShakeAttentionState extends State<_ShakeAttention>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller;
+  double _lastValue = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 700),
+    );
+    _controller.addListener(_maybeHaptic);
+    if (widget.active) _controller.repeat();
+  }
+
+  void _maybeHaptic() {
+    // Al reiniciar el ciclo (value vuelve cerca de 0), damos un toque háptico
+    // para que el teléfono "vibre" de forma rítmica junto con el shake.
+    if (_controller.value < _lastValue) {
+      HapticFeedback.lightImpact();
+    }
+    _lastValue = _controller.value;
+  }
+
+  @override
+  void didUpdateWidget(covariant _ShakeAttention oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.active && !_controller.isAnimating) {
+      HapticFeedback.mediumImpact();
+      _controller.repeat();
+    } else if (!widget.active && _controller.isAnimating) {
+      _controller.stop();
+      _controller.value = 0;
+      _lastValue = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.removeListener(_maybeHaptic);
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.active) return widget.child;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        // Tres oscilaciones por ciclo con amplitud decreciente al final.
+        final envelope = sin(_controller.value * pi); // 0 -> 1 -> 0
+        final dx = sin(_controller.value * pi * 6) * 6 * envelope;
+        return Transform.translate(offset: Offset(dx, 0), child: child);
+      },
+      child: widget.child,
     );
   }
 }
